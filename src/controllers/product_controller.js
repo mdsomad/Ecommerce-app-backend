@@ -41,7 +41,7 @@ fetchAllProducts: async function(req, res) {
 fetchProductByCategory: async function(req, res) {
     try {
         const categoryId = req.params.id;
-        const products = await ProductModel.find({category: categoryId });
+        const products = await ProductModel.find({category:categoryId });
         return res.status(200).json({ success: true, data: products });
     }
     catch(ex) {

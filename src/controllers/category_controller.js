@@ -52,22 +52,21 @@ fetchAllCategories: async function(req, res) {
 
 //TODO: Create fetchCategoryById function
 fetchCategoryById: async function(req, res) {
-
     try {
-
         const id = req.params.id;
         const foundCategory = await CategoryModel.findById(id);
 
         if(!foundCategory) {
-            return res.status(404).json({ success: false, message: "Category not found!" });
-            }
+            return res.json({ success: false, message: "Category not found!" });
+        }
 
-            return res.status(200).json({ success: true, data: foundCategory });
+        return res.json({ success: true, data: foundCategory });
     }
     catch(ex) {
-        return res.status(500).json({ success: false, message: ex });
+        return res.json({ success: false, message: ex });
     }
 }
+
 
 
 

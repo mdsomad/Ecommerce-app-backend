@@ -1,6 +1,6 @@
-
 import UserModel from "../models/user_model.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 
 const UserController = {
@@ -18,7 +18,15 @@ createAccount: async function(req, res) {
         const newUser = new UserModel(userData);
         await newUser.save();
 
-        return res.status(201).json({success: true, data: newUser, message: "User created!" });
+
+        const saved_user = await UserModel.findOne({email:userData.email})   //* <-- User Find Database
+        
+       
+        //* generate JWT token        user id            SECRET_KEY               token expiry time
+        const token = jwt.sign({userID:saved_user._id},process.env.JWT_SECRET_KEY,{expiresIn:"30d"});
+        
+         
+        return res.status(201).json({success: true,token: token, data: newUser, message: "User created!" });
         
     }
     catch(ex) {
@@ -43,7 +51,7 @@ signIn: async function(req, res) {
 
 
         if(!foundUser) {
-            return res.status(404).json({ success: false, message: "User not found!" });
+            return res.json({ success: false, message: "User not found!" });
         }
          
 
@@ -51,19 +59,54 @@ signIn: async function(req, res) {
         const passwordsMatch = bcrypt.compareSync(password,foundUser.password);
 
         if(!passwordsMatch) {
-            return res.status(400).json({ success: false, message: "Incorrect password!" });
+            return res.json({ success: false, message: "Incorrect password!" });
          }
 
-        return res.status(200).json({ success: true, data: foundUser });
+
+         
+        //* generate JWT token
+        const token = jwt.sign({userID:foundUser._id},process.env.JWT_SECRET_KEY,{expiresIn:"30d"});
+
+        return res.status(200).json({ success: true,token: token, data: foundUser });
     }
     catch(ex) {
-        return res.status(500).json({ success: false, message: ex });
+        return res.json({ success: false, message: ex });
     }
 
 },
     
     
-    
+
+
+
+//TODO  Create User updateUser function 
+updateUser: async function(req, res) {
+    try {
+        const userId = req.params.id;
+        const updateData = req.body;
+
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { _id: userId },
+            updateData,
+            { new: true }
+        );
+
+        if(!updatedUser) {
+            throw "user not found!";
+        }
+
+        return res.json({ success: true, data: updatedUser, message: "User updated!" });
+    }
+    catch(ex) {
+        return res.json({ success: false, message: ex });
+    }
+}
+
+
+
+
+
+
     
 
 

@@ -5,7 +5,7 @@ const ProductRoutes = express.Router();
 
 
 ProductRoutes.get("/", ProductController.fetchAllProducts);
-ProductRoutes.get("/category/:id", ProductController.fetchProductByCategory);
+ProductRoutes.get("/category/:id",ProductController.fetchProductByCategory);
 ProductRoutes.post("/", ProductController.createProduct);
 
 
